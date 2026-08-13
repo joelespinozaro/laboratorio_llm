@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: ollama/ollama
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+model:
+  name: "qwen2.5:0.5b"     # modelo pequeño que corre bien en CPU (~400 MB)
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "2Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
+
+service:
+  type: ClusterIP
+  port: 11434              # puerto nativo de Ollama

@@ -1,0 +1,36 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: vllm-autoscaler
+  namespace: ai-serving
+spec:
+  scaleTargetRef:
+    name: vllm-lab
+
+  minReplicaCount: 1    # siempre hay al menos 1 réplica caliente
+  maxReplicaCount: 3    # límite para el lab (en producción sería mayor)
+
+  # Espera 120 segundos antes de hacer scale-down
+  # Importante porque cargar el modelo toma tiempo — no queremos ciclos rápidos
+  cooldownPeriod: 120
+
+  triggers:
+    # Trigger 1: queue depth
+    # Escala cuando el promedio de requests en cola supere 3
+    - type: prometheus
+      metadata:
+        serverAddress: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          avg(vllm:num_requests_waiting{namespace="ai-serving"})
+        threshold: "3"
+
+    # Trigger 2: latencia P99
+    # Escala cuando la latencia P99 supere 2 segundos
+    - type: prometheus
+      metadata:
+        serverAddress: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
+        query: |
+          histogram_quantile(0.99,
+            rate(vllm:e2e_request_latency_seconds_bucket{namespace="ai-serving"}[2m])
+          )
+        threshold: "2.0"
