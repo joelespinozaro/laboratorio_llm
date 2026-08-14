@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: ollama/ollama
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+model:
+  name: "gemma4:e4b"     # modelo pequeño que corre bien en CPU (~400 MB)
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "4Gi"
+  limits:
+    cpu: "4"
+    memory: "8Gi"
+
+service:
+  type: ClusterIP
+  port: 11434              # puerto nativo de Ollama
