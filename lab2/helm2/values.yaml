@@ -5,9 +5,10 @@ image:
   tag: "latest"
   pullPolicy: IfNotPresent
 
-model:
-  name: "gemma4:e4b"     # modelo pequeño que corre bien en CPU (~400 MB)
-
+models:
+  - "gemma4:e4b"     # modelo pequeño que corre bien en CPU (~400 MB)
+  - "qwen2.5:0.5b"
+  
 resources:
   requests:
     cpu: "500m"
